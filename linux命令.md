@@ -698,9 +698,6 @@ Administrator. It usually boils down to these three things:
 ## xxx 为 具体服务名称：sshd、iptables（防火墙）、mysql
 service xxx status/stop/start/restart   
 
-## 备注：centos7 防火墙服务操作未经验证
-systemctl start/stop/status firewalld
-
 ## 下面的暂时不懂了，尼玛
 service --status-all   # 查看系统所有的后台服务进程
 service --status-all | grep httpd  # 指定
@@ -713,6 +710,11 @@ chkconfig --level 35 httpd on ## 指定在系统的启动级别为3和5的情况
 chkconfig --list   ## 所有
 chkconfig --list | grep httpd ## 指定
 ```
+
+centos7：systemctl start/stop/status/restart <serviceName>
+
++ firewalld：防火墙
++ network.service：网卡
 
 ```shell
 查看firewall防火墙的状态
@@ -731,6 +733,32 @@ firewall-cmd --query-port=80/tcp
 关闭80端口
 firewall-cmd --remove-port=80/tcp
 ```
+
+### 静态IP
+
+网卡路径：cat /etc/sysconfig/network-scripts/ifcfg-ens......        然后再重启网卡
+
+```shell
+BOOTPROTO="static" 
+IPADDR=xxx.xxx.xxx.xxx 
+GATEWAY=xxx.xxx.xxx.xxx 
+NETMASK=255.255.255.0 
+ONBOOT="yes"
+```
+
+ping不通域名：vi /etc/resolv.conf 加上以下域名服务器解析地址 
+
+```shell
+nameserver 114.114.114.114 
+nameserver 8.8.8.8 
+nameserver 1.1.1.1
+```
+
+### 别名
+
++ 永久设置：vi /root/.bashrc
+  + alias vinet='vi /etc/sysconfig/network-scripts/ifcfg-ens...' 
++ 加载使立即生效： source /root/.bashrc
 
 ###  系统启动级别管理
 
@@ -1049,9 +1077,13 @@ IPV6INIT=no  #这个可以不要
 USERCTL=no   #这个可以不要
 ```
 
-###  域名映射：vi /etc/hosts
+###  域名映射
+
+vi /etc/hosts
 
 配置完后最好重启：reboot
+
+查看机器名称：hostname
 
 ```shell
 [root@mini1 ~]# cat /etc/hosts
@@ -1062,34 +1094,52 @@ USERCTL=no   #这个可以不要
 [root@mini1 ~]# ping mini1
 ```
 
-###  ssh
+###  免密登录
+
+**注意：自己也要给自己配置免密登录哦**
 
 ```shell
-免密登录：(注意，自己也要给自己配置免密登录哦)
-
 ssh-keygen -t rsa   ## 生成公钥和秘钥
 ssh-copy-id root@mini2  ##  把钥匙发送到mini2这台机器上面
-
+reboot ## 重启才能使配置生效
 ssh mini2;ssh 192.168.207.133  ##  登录另外一台机器，免密登录？
-
 exit ## 退出当前登录的机器
 ```
 
-```
-
-192.168.8.61，192.168.8.62  root/cxtest2017
-
-~richmail/bin/mysql_rm
-
-show databases;
-
-drop database monitor1;
-
-create database monitor1 character set utf8 collate utf8_bin;
-use monitor1;
-source /home/richmail/richmonitor/schema.sql;
-source /home/richmail/richmonitor/images.sql;
-source /home/richmail/richmonitor/data.sql;
+```shell
+[root@centos-7 ~]# ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa): 
+/root/.ssh/id_rsa already exists.
+Overwrite (y/n)? y
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.   ## 秘钥生成在这里了
+The key fingerprint is:
+SHA256:5AO6rUBErNylqmQL0WUjMbidc6YWrDTfHvubD66Lbwo root@centos-7
+The key's randomart image is:
++---[RSA 2048]----+
+| o+.             |
+|..o.+.           |
+|.*o=o.. .        |
+|+=Boo. +         |
+|.o=*o   S        |
+|o=o. =   .       |
+|=Eo o +.         |
+|.....=. o        |
+|   o=++=o.       |
++----[SHA256]-----+
+[root@centos-7 ~]# ll /root/.ssh
+total 12
+-rw-------. 1 root root 1675 Dec 20 22:55 id_rsa
+-rw-r--r--. 1 root root  395 Dec 20 22:55 id_rsa.pub
+-rw-r--r--. 1 root root  403 Dec 20 22:45 known_hosts
+## 这里拷贝的另外一种很麻烦的方法，注意拷贝过去的名字一定要是 authorized_keys
+[root@centos-7 ~]# scp /root/.ssh/id_rsa.pub root@mini1:/root/.ssh/authorized_keys
+root@mini1's password: 
+id_rsa.pub                                                 100%  395   747.5KB/s   00:00    
+[root@centos-7 ~]# reboot
 ```
 
 ### 数据库
