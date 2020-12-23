@@ -7,13 +7,11 @@ ctrl + l   ## 清屏好使好多
 lsb_release -a  ## 查看服务器信息
 ```
 
-###  wget 
+###  yum
 
-```shell
-yum install wget
-###  例如：redis
-wget http://download.redis.io/releases/redis-6.0.6.tar.gz
-```
++ wget：yum install wget
++ rz/sz：yum install lrzsz
++ gcc：yum install -y gcc-c++
 
 ###  diff;man;pwd;--help;echo
 
@@ -87,12 +85,6 @@ xiaofeng01
 root
 ```
 
-sz;rz
-
-```shell
-用ZModem吧。安装：yum install lrzsz
-```
-
 ###  cd;ls
 
 ```shell
@@ -119,7 +111,7 @@ ls -lrt | grep *pop3*
 ```shell
 mkdir aaa    ## 这是相对路径的写法
 mkdir  /data   ## 这是绝对路径的写法
-mkdir -p  aaa/bbb/ccc ##  级联创建目录
+mkdir -p  aaa/bbb/ccc ##  级联创建目录，尼玛这个居然不知道自己有记笔记
 rmdir  aaa  ## 可以删除空目录
 rm  -r  aaa ## 级联删除
 rm  -rf  aaa  ##  强制级联删除aaa
@@ -129,11 +121,20 @@ rm -rf *.xml *.txt  ## 删除所有后缀名为xml以及txt 的文件
 
 ###  touch;mv;cp;scp
 
- + 创建文件haha：touch haha
+ + touch
 
- + 将文件haha改名为xixi：mv haha xixi
+     + 创建文件haha：touch haha
 
- + 将文件xixi移动到当前目录下面的文件夹heihei内：mv xixi heihei
++ cp
+
+    + cp -rf aaa bbb：
+    + 复制目录的时候，要加-r，表示递归recusive，
+    + -f，覆盖已经存在的目标文件而不给出提示。
+
+ + mv
+
+     + 将文件haha改名为xixi：mv haha xixi
+     + 将文件xixi移动到当前目录下面的文件夹heihei内：mv xixi heihei
 
  + scp
 
@@ -711,7 +712,7 @@ chkconfig --list   ## 所有
 chkconfig --list | grep httpd ## 指定
 ```
 
-centos7：systemctl start/stop/status/restart <serviceName>
+centos7：systemctl start/stop/status/restart <serviceName>.service
 
 + firewalld：防火墙
 + network.service：网卡
