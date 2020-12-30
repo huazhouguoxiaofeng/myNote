@@ -1162,3 +1162,16 @@ source /home/richmail/richmonitor/images.sql;
 source /home/richmail/richmonitor/data.sql;
 ```
 
+```shell
+#!/bin/sh
+
+mysql_home=/home/richmail/mysql
+db_user=richmail
+db_port=3308
+db_host=192.168.8.181
+db_password=cx12345678
+#db_password=cx12345678
+
+$mysql_home/bin/mysql -P$db_port -h$db_host -u$db_user -p$db_password
+```
+
