@@ -49,6 +49,8 @@ echo "redis cluster stopped......"
 
 + -jar -Drmbasic.conf.path=   指定什么鬼配置文件启动
 + -Dspring.config.location=    springboot指定配置文件启动
++ -agentlib   服务器调试用的
++ 两个> ${LOG_PATH}/RichMonitorCore.log 2>&1  把输出的nohup.out输出到特定的日志路径
 
 ```shell
 #!/bin/bash
@@ -57,7 +59,7 @@ APP_NAME=rich.monitor-0.0.1-SNAPSHOT.jar
 APP_PATH=/home/richmail/web/monitor
 CONFIG_PATH=/home/richmail/web/monitor/config
 LOG_PATH=/home/richmail/logs/webapp/RichMonitorCore
-nohup java -jar -Drmbasic.conf.path=$CONFIG_PATH/  -Dspring.config.location=$CONFIG_PATH/application.properties   $APP_PATH/$APP_NAME >> $LOG_PATH/RichMonitorCore.log 2>&1  &
+nohup java -jar -Drmbasic.conf.path=${CONFIG_PATH}/  -Dspring.config.location=${CONFIG_PATH}/application.properties -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5999 ${APP_PATH}/${APP_NAME} >> ${LOG_PATH}/RichMonitorCore.log 2>&1  &
 echo richMonitor started!!!
 
 #!/bin/bash
