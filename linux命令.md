@@ -354,16 +354,16 @@ crontab -r #删除crontab里的所有任务
 * * * * * /home/hahahome/timer/test02.sh >> /home/hahahome/timer/haha.txt
 ```
 
-	+ 每分钟执行：\* * * * * 或者 */1 * * * *
-	+ 每小时执行 ：0 * * * *
-	+ 每天执行：0 0 * * * 
-	+ 每周执行：0 0 * * 0 
-	+ 每月执行 ：0 0 1 * *
-	+ 每年执行 ：0 0 1 1 *
-	+ 每天早上6点执行 ：0 6 * * *
-	+ 每两个小时执行 ：0 */2 * * *
-	+ 每小时的10分，40分执行 ：10,40 * * * *
-	+ 每天的下午4点、5点、6点的5 min、15 min、25 min、35 min、45 min、55 min时执行命令：5,15,25,35,45,55 16,17,18 * * *
++ 每分钟执行：\* * * * * 或者 */1 * * * *
++ 每小时执行 ：0 * * * *
++ 每天执行：0 0 * * * 
++ 每周执行：0 0 * * 0 
++ 每月执行 ：0 0 1 * *
++ 每年执行 ：0 0 1 1 *
++ 每天早上6点执行 ：0 6 * * *
++ 每两个小时执行 ：0 */2 * * *
++ 每小时的10分，40分执行 ：10,40 * * * *
++ 每天的下午4点、5点、6点的5 min、15 min、25 min、35 min、45 min、55 min时执行命令：5,15,25,35,45,55 16,17,18 * * *
 
 ###  重定向
 
@@ -714,23 +714,18 @@ chkconfig --list | grep httpd ## 指定
 
 centos7：systemctl start/stop/status/restart <serviceName>.service
 
-+ firewalld：防火墙
++ firewalld：防火墙；（永久关闭防火墙：systemctl disable firewalld.service）
 + network.service：网卡
 
 ```shell
-查看firewall防火墙的状态
-firewall-cmd --state
-查看防火墙开放端口规则
-firewall-cmd --list-port
-开放80端口
-firewall-cmd --permanent --add-port=80/tcp （--permanent永久生效，没有此参数重启后就失效）
-加载生效开放的端口
-firewall-cmd --reload
-查询指定端口80是否开放
-firewall-cmd --query-port=80/tcp
+查看firewall防火墙的状态：firewall-cmd --state
+查看防火墙开放端口规则：firewall-cmd --list-port
+开放80端口：firewall-cmd --permanent --add-port=80/tcp （--permanent永久生效，没有此参数重启后就失效）
+加载生效开放的端口：firewall-cmd --reload
+查询指定端口80是否开放：firewall-cmd --query-port=80/tcp
 验证80端口是否开放：
-安装telnet命令：yum -y install xinetd telnet telnet-server （确认联网状态）
-安装netstat与ifconfig命令：yum -y install net-tools（确认联网状态）
+    安装telnet命令：yum -y install xinetd telnet telnet-server （确认联网状态）
+    安装netstat与ifconfig命令：yum -y install net-tools（确认联网状态）
 关闭80端口
 firewall-cmd --remove-port=80/tcp
 ```

@@ -103,6 +103,7 @@ cd /usr/local/apache-tomcat-7.0.47/bin/
   指定配置文件启动： /usr/local/nginx-1.18.0/sbin/nginx -c /usr/local/nginx-1.18.0/conf/nginx.conf 
   测试里面的配置文件是否正确： /usr/local/nginx-1.18.0/sbin/nginx -t 
   关闭： /usr/local/nginx-1.18.0/sbin/nginx -s stop
-  ```
-
+  重新加载所修改的配置文件：./nginx -s reload
+```
+  
   
