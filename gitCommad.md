@@ -7,7 +7,7 @@ https://www.cnblogs.com/convict/p/10795320.html
 + git init：初始化本地库
 + git status：查看工作区、暂存区的状态
 + git add <file name>：将工作区的“新建/修改”添加到暂存区
-+ git commit -m "提交日志" <file name>：文件从暂存区到本地库
++ git commit -m "提交日志" <file name>：文件从暂存区到本地库，如果不加文件名，就是commit全部
 + git rm --cached <file name>：移除暂存区的修改
 
 
@@ -17,4 +17,4 @@ https://www.cnblogs.com/convict/p/10795320.html
 ## 二、本地库跟远程库交互
 
  + git clone <远程库地址>：克隆远程库
- + git push
+ + git push： 如果不加文件名，就是push全部

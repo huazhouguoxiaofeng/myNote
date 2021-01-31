@@ -39,6 +39,8 @@
 
 ## nginx.conf
 
+原来可以有多个location的，注意这里有什么不一样
+
 ```shell
 http {
 	    ## http://ngtest02.com/app/img/034.jpg
@@ -61,8 +63,8 @@ http {
 		## 负载均衡，按照不同的策略分发到不同的服务器上面：http://ngtest01.com/api/v1/pub/web    
 		## server 192.168.207.140:8080 weight=5; 按照一定的权重分发流量
 		## server 192.168.159.133:8080 down; down 表示当前的server暂时不参与负载
-		## server 192.168.159.133:8080 backup; 其它所有的⾮backup机器down的时候，会请求
-			##	backup机器，这台机器压⼒会最轻，配置也会相对低
+		## server 192.168.159.133:8080 backup; 其它所有的⾮backup机器down的时候，会请求backup机器，这台机器压⼒会最轻，配置也会相对低
+		## server 192.168.0.106:8080 max_fails=2 fail_timeout=60s; 请求连续失败的次数达到两次之后，在接下去的60s内，不会在请求，60秒之后再尝试请求。（具体什么是nginx认为的失败呢：可以通过指令proxy_next_upstream来配置什么是失败的尝试；注意默认配置时，http_404状态不被认为是失败的尝试。）
 	    upstream haha {
     	    server 192.168.207.140:8080; 
         	server 192.168.207.140:8081;
@@ -70,10 +72,25 @@ http {
 		server {
 	        listen       80;
     	    server_name  ngtest01.com;
-       	location /api/v1 { ## 这里是指那个请求地址的路径哦
-                 proxy_pass http://haha; ## 对应上面的upstream
-                 proxy_redirect default;
-       	}
+            location /api/v1 { ## 这里是指那个请求地址的路径哦
+                     proxy_pass http://haha; ## 对应上面的upstream
+                     proxy_redirect default;
+                     proxy_next_upstream error timeout http_500 http_503 http_404;
+                     # 存放用户的真实ip
+                     proxy_set_header Host $host;
+                     proxy_set_header X-Real-IP $remote_addr;  
+                     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  
+                     proxy_next_upstream error timeout http_503 non_idempotent;
+                     # 开启错误拦截配置,一定要开启
+                     proxy_intercept_errors on;
+            }
+            # 不加 =200，则返回的就是原先的http错误码；配上后如果出现500等错误都返回给⽤户200状态，并跳转⾄/default_api
+            # 返回404,404转向200,200的话，就跳向路径 /default_api ，这个路径的话，就返回一个json
+		   error_page 404 500 502 503 504 =200  /default_api;
+             location = /default_api {
+                 default_type application/json;
+                 return 200 '{"code":"-1","msg":"invoke fail, not found "}';
+             }
 	}
 
 }
