@@ -148,7 +148,6 @@ SELECT COUNT(DISTINCT deptno) FROM emp; -- 消除重复值
 
 ```sql
 SELECT t.county_name,LISTAGG(t.street_name,',') WITHIN GROUP (ORDER BY t.cover_id) FROM pmp_agnt_cover_info t WHERE t.city_name = '深圳市' GROUP BY t.county_name; 
-SELECT to_char(wm_concat(name099)) FROM test099; -- a,b,c,d,e
 SELECT id,to_char(wm_concat(name099)) FROM test099 GROUP BY ID; -- 1 a,c,b   2 d,e
 ```
 
