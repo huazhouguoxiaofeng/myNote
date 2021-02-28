@@ -1,6 +1,14 @@
 https://www.cnblogs.com/convict/p/10795320.html
 
-## 一、本地操作
+## 一、初始化操作
+
+```
+https://blog.csdn.net/lw545034502/article/details/90696872
+```
+
+
+
+## 二、本地操作
 
 ### 1）其它
 
@@ -14,7 +22,7 @@ https://www.cnblogs.com/convict/p/10795320.html
 
 
 
-## 二、本地库跟远程库交互
+## 三、本地库跟远程库交互
 
  + git clone <远程库地址>：克隆远程库
  + git push： 如果不加文件名，就是push全部
