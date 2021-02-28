@@ -797,6 +797,14 @@ apache     2027   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd
 root       2310   2245  0 10:29 pts/0    00:00:00 grep httpd
 ```
 
+### lsof
+
+查看端口被占用了
+
+```shell
+lsof -i:80
+```
+
 ### sar
 
 查看CPU
