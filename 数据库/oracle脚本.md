@@ -68,11 +68,11 @@ SELECT EXTRACT(YEAR FROM SYSTIMESTAMP) AS YEARS,
 
 ```sql
 select 
-      ut.COLUMN_NAME,--字段名称
-      uc.comments,--字段注释
-      ut.DATA_TYPE,--字典类型
-      ut.DATA_LENGTH,--字典长度
-      ut.NULLABLE--是否为空
+      ut.COLUMN_NAME,-- 字段名称
+      uc.comments,-- 字段注释
+      ut.DATA_TYPE,-- 字典类型
+      ut.DATA_LENGTH,-- 字典长度
+      ut.NULLABLE-- 是否为空
 from user_tab_columns  ut
 inner JOIN user_col_comments uc
 on ut.TABLE_NAME  = uc.table_name and ut.COLUMN_NAME = uc.column_name
