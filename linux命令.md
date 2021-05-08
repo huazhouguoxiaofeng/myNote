@@ -713,7 +713,7 @@ chkconfig --list   ## 所有
 chkconfig --list | grep httpd ## 指定
 ```
 
-centos7：systemctl start/stop/status/restart <serviceName>.service
+centos7：systemctl start/stop/status/<serviceName>.service
 
 + firewalld：防火墙；（永久关闭防火墙：systemctl disable firewalld.service）
 + network.service：网卡
@@ -733,7 +733,7 @@ firewall-cmd --remove-port=80/tcp
 
 ### 静态IP
 
-网卡路径：cat /etc/sysconfig/network-scripts/ifcfg-ens......        然后再重启网卡
+网卡路径：cat /etc/sysconfig/network-scripts/ifcfg-ens......        然后再重启网卡  systemctl  restart  network.service
 
 ```shell
 BOOTPROTO="static" 
