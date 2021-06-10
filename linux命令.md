@@ -12,6 +12,7 @@ lsb_release -a  ## 查看服务器信息
 + wget：yum install wget
 + rz/sz：yum install lrzsz
 + gcc：yum install -y gcc-c++
++ netstat：yum -y install net-tools
 
 ###  diff;man;pwd;--help;echo
 
@@ -566,10 +567,9 @@ ln -s  /home/hahahome/aaa/111 ../bbb/222  ## /home/hahahome/aaa
    Modify: 2020-11-19 02:16:20.108344869 +0800
    Change: 2020-11-19 02:16:25.016344645 +0800
    [root@mini1 bbb]# ls -li
-total 0
+   total 0
    282021 -rw-r--r--. 2 root root 0 Nov 19 02:16 222
    ```
-   
 ### 权限
 
 ####  文件权限
@@ -607,12 +607,13 @@ chown angela:angelaccc aaa/ ## 同时修改所属用户和所属组
 
 + 查看用户信息：cat /etc/passwd 
 
-  /sbin/nologin #是不可登录的 
-  /bin/bash #可以登录
+  ```shell
+  esTest:x:1000:1001::/home/esTest:/bin/bash
+  ```
 
-  | 用户       | 密码占位符 | UID   | GID  | 用户描述 | 用户家目录      | 登录后使用的shell解释 |
-  | ---------- | ---------- | ----- | ---- | -------- | --------------- | --------------------- |
-  | testuser02 | :x         | :1010 | :502 |          | :/home/hahahome | :/bin/bash            |
+  | 用户       | 密码占位符 | UID   | GID  | 用户描述 | 用户家目录      | 登录后使用的shell解释                                     |
+  | ---------- | ---------- | ----- | ---- | -------- | --------------- | --------------------------------------------------------- |
+  | testuser02 | :x         | :1010 | :502 |          | :/home/hahahome | :/bin/bash # 可以登录<br />:/sbin/nologin  # 是不可登录的 |
 
 + 添加用户：useradd xiaolan 
 
@@ -624,7 +625,17 @@ chown angela:angelaccc aaa/ ## 同时修改所属用户和所属组
 
 + 添加用户组命令：groupadd
 
-+ 删除用户组命令：groupdel
+  ```shell
+  # 添加一个叫es的用户组
+  [root@AliYun config]# groupadd es
+  ```
+
++ 删除用户组命令：groupdel （但是前提是这个用户是处于退出状态，否则出现以下信息（可以关掉session，或者在该session输入exit命令）
+
+  ```shell
+  [root@mini1 home]# userdel -r xiaolan g
+  userdel: user xiaolan is currently used by process 3977
+  ```
 
 + 修改用户的信息命令：usermod
 
@@ -632,37 +643,52 @@ chown angela:angelaccc aaa/ ## 同时修改所属用户和所属组
   + -d #指定用户主目录
   + -g #指定用户所属组
 
+  ```shell
+  # 修改用户esTest到组es
+  [root@AliYun config]# usermod esTest -g es
+  ```
+
 + groups：查看当前用户组信息
 
-+ 切换到xiaolan用户：su xiaolan 
+  ```shell
+  [root@AliYun config]# groups
+  root
+  [root@AliYun config]# su esTest
+  [esTest@AliYun config]$ groups
+  es
+  ```
+
++ 切换到xiaolan用户
+
+  ```shell
+  [root@mini1 home]# su xiaolan 
+  ```
 
 + id：查看用户信息
 
+  ```shell
+  [root@mini1 ~]# id
+  uid=0(root) gid=0(root) groups=0(root) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+  [root@mini1 ~]# su testuser02
+  [testuser02@mini1 root]$ id
+  uid=1010(testuser02) gid=502(testgroup) groups=502(testgroup) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+  [testuser02@mini1 root]$ su - root
+  Password: 
+  [root@mini1 ~]# id testuser02
+  uid=1010(testuser02) gid=502(testgroup) groups=502(testgroup)
+  ```
+
 + 给用户设置密码：passwd xiaolan 
 
-
-```shell
-[root@mini1 home]# passwd xiaolan 
-Changing password for user xiaolan.
-New password: 
-BAD PASSWORD: it is too simplistic/systematic
-BAD PASSWORD: is too simple
-Retype new password: 
-passwd: all authentication tokens updated successfully.
-# 删除用户，但是前提是这个用户是处于退出状态，否则出现以下信息（可以关掉session，或者在该session输入exit命令）
-[root@mini1 home]# userdel -r xiaolan 
-userdel: user xiaolan is currently used by process 3977
-
-[root@mini1 ~]# id
-uid=0(root) gid=0(root) groups=0(root) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
-[root@mini1 ~]# su testuser02
-[testuser02@mini1 root]$ id
-uid=1010(testuser02) gid=502(testgroup) groups=502(testgroup) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
-[testuser02@mini1 root]$ su - root
-Password: 
-[root@mini1 ~]# id testuser02
-uid=1010(testuser02) gid=502(testgroup) groups=502(testgroup)
-```
+  ```shell
+  [root@mini1 home]# passwd xiaolan 
+  Changing password for user xiaolan.
+  New password: 
+  BAD PASSWORD: it is too simplistic/systematic
+  BAD PASSWORD: is too simple
+  Retype new password: 
+  passwd: all authentication tokens updated successfully.
+  ```
 
 ####  普通用户进行管理员权限操作
 
@@ -776,26 +802,49 @@ id:5:initdefault:  # 配置默认启动级别
 
 ###  netstat 
 
-```shell
-功能说明：查看网络端口的使用情况
-举 例：netstat -tunlp | grep nginx
+查看网络端口的使用情况
+
 -t ：显示tcp端口
 -u ：显示UDP端口
 -n ：指明拒绝显示别名
 -l ：指明listen的
 -p ：指明显示建立相关连接的程序名
-安装netstat命令：yum -y install net-tools
 
-netstat -nltp ## 查看全部端口的监听情况
-netstat -nltp | grep 3306 ## 指定
-netstat -nltp | grep mysql ## 指定
-
-[root@mini1 ~]# ps -ef | grep httpd ## 指定进程，说明httpd是一个多进程的东东
-root       2020      1  0 10:11 ?        00:00:00 /usr/sbin/httpd ## 当前进程号，父进程
-apache     2024   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd ## 父进程是2020啊
-apache     2025   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd ## /usr/sbin/httpd 表示是通过这个目录下面的命令启动这个进程的
-apache     2027   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd
-root       2310   2245  0 10:29 pts/0    00:00:00 grep httpd
+```shell
+[esTest@AliYun config]$ netstat -ntlp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:9200            0.0.0.0:*               LISTEN      4612/java           
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:9300            0.0.0.0:*               LISTEN      4612/java           
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+[esTest@AliYun config]$ netstat -ntlpu
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:9200            0.0.0.0:*               LISTEN      4612/java           
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:9300            0.0.0.0:*               LISTEN      4612/java           
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -                   
+udp        0      0 172.18.220.210:123      0.0.0.0:*                           -                   
+udp        0      0 127.0.0.1:123           0.0.0.0:*                           -                   
+udp        0      0 0.0.0.0:123             0.0.0.0:*                           -                   
+udp        0      0 0.0.0.0:36646           0.0.0.0:*                           -                   
+udp6       0      0 :::123                  :::*                                -                   
+udp6       0      0 :::56050                :::*                                -       
+[esTest@AliYun config]$ netstat -ntlp | grep java
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+tcp        0      0 0.0.0.0:9200            0.0.0.0:*               LISTEN      4612/java           
+tcp        0      0 0.0.0.0:9300            0.0.0.0:*               LISTEN      4612/java           
+[esTest@AliYun config]$ netstat -ntlp | grep 9200
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+tcp        0      0 0.0.0.0:9200            0.0.0.0:*               LISTEN      4612/java 
 ```
 
 ### lsof
@@ -888,6 +937,12 @@ root          1  0.0  0.0  19364  1536 ?        Ss   Nov18   0:01 /sbin/init
 root          2  0.0  0.0      0     0 ?        S    Nov18   0:00 [kthreadd]
 root          3  0.0  0.0      0     0 ?        S    Nov18   0:00 [migration/0]
 root          4  0.0  0.0      0     0 ?        S    Nov18   0:00 [ksoftirqd/0]
+[root@mini1 ~]# ps -ef | grep httpd ## 指定进程，说明httpd是一个多进程的东东
+root       2020      1  0 10:11 ?        00:00:00 /usr/sbin/httpd ## 当前进程号，父进程
+apache     2024   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd ## 父进程是2020啊
+apache     2025   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd ## /usr/sbin/httpd 表示是通过这个目录下面的命令启动这个进程的
+apache     2027   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd
+root       2310   2245  0 10:29 pts/0    00:00:00 grep httpd
 ```
 
 ###  free;top;df;du
