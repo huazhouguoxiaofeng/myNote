@@ -129,9 +129,9 @@ rm -rf *.xml *.txt  ## 删除所有后缀名为xml以及txt 的文件
 
 + cp
 
-    + cp -rf aaa bbb：
-    + 复制目录的时候，要加-r，表示递归recusive，
-    + -f，覆盖已经存在的目标文件而不给出提示。
+    + -r：复制目录的时候，表示递归recusive，
+    + -f：覆盖已经存在的目标文件而不给出提示。
+    + -a：复制目录后其文件属性会发生变化，想要使得复制之后的目录和原目录完全一样（文件权限等），可以加 -a
 
  + mv
 
@@ -658,12 +658,6 @@ chown angela:angelaccc aaa/ ## 同时修改所属用户和所属组
   es
   ```
 
-+ 切换到xiaolan用户
-
-  ```shell
-  [root@mini1 home]# su xiaolan 
-  ```
-
 + id：查看用户信息
 
   ```shell
@@ -688,6 +682,15 @@ chown angela:angelaccc aaa/ ## 同时修改所属用户和所属组
   BAD PASSWORD: is too simple
   Retype new password: 
   passwd: all authentication tokens updated successfully.
+  ```
+  
++ su：加 - 会跳到跳转用户的家目录，没有横杠的会继续待在原本目录
+
+  ```shell
+  su[回车]   # 返回root用户，目录还在当前目录
+  su xiaolan  # 调转到tom用户，目录还在当前目录
+  su - [回车]  # 跳转root用户，目录跳转到root的家目录
+  su - xiaolan  # 跳转到tom用户，目录在tom用户的家目录
   ```
 
 ####  普通用户进行管理员权限操作
