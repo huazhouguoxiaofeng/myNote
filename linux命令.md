@@ -803,7 +803,7 @@ nameserver 1.1.1.1
 id:5:initdefault:  # 配置默认启动级别
 ```
 
-###  netstat 
+###  netstat ：端口
 
 查看网络端口的使用情况
 
@@ -888,7 +888,7 @@ sar -n DEV （查看全天）
 sar -n DEV 1 2 （1：每隔一秒，2：写入2次）
 ```
 
-###  ps
+###  ps：查看进程
 
 process status 的缩写
 
@@ -950,45 +950,108 @@ root       2310   2245  0 10:29 pts/0    00:00:00 grep httpd
 
 ###  free;top;df;du
 
-top ：监控Linux系统状况，比如cpu、内存的使用；按住键盘q退出
+* **top**：监控Linux系统状况，比如cpu、内存的使用；按住键盘q退出
 
-```shell
-[root@SYSOPS00074145 gxf]# free -h  ## 查看系统内存
-              total        used        free      shared  buff/cache   available
-Mem:           3.7G        1.6G        230M        184M        1.9G        1.7G
-Swap:          8.0G        110M        7.9G
-[root@SYSOPS00074145 gxf]# free -m   ## 查看系统内存，跟上面的单位不一样
-              total        used        free      shared  buff/cache   available
-Mem:           3790        1589         230         184        1970        1709
-Swap:          8191         110        8081
+  * o：sort，排序
+  * d：单位为秒，显示的页面多久更新一次，默认3秒
 
-(df 查看整体的哦)
+  ```shell
+  top -o +%MEM ## 内存从大到小查看
+  top -o +%CPU ## CPU从大道小查看
+  top -d 5 ## 5秒刷新一次页面
+  ```
 
-[root@SYSOPS00074145 practice]# df -h ## 文件系统的磁盘使用情况统计 
-[root@mini1 mypractice]# df -h
-Filesystem            Size  Used Avail Use% Mounted on
-/dev/mapper/vg_mini1-lv_root
-                       18G  7.1G  9.3G  44% /
-tmpfs                 1.5G  432K  1.5G   1% /dev/shm
-/dev/sda1             477M   37M  415M   9% /boot
-/dev/sr0              3.7G  3.7G     0 100% /media/CentOS_6.7_Final
+  * ![image-20210615155240945](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210615155240945.png)
 
+    | 15:52:17 | up 1 day, 23:46  | 2 users                                                  | load average: 0.00, 0.02, 0.05                               |
+    | -------- | ---------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+    | 当前时间 | 该服务器运行时间 | 当前用户登录数。<br />多少个窗口，多少个用户，相同的也算 | 系统负载，即任务队列的平均长度。<br />三个数值分别为 1分钟、5分钟、15分钟前到现在的平均值。<br />如果这个数除以逻辑CPU的数量，结果高于5的时候表明系统在超负荷运转 |
 
-(du 查看细节的哦)
-[root@mini1 home]# ll
-total 16
-drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 02xiaofeng
--rw-r--r--. 1 root       root          0 Jul 30 23:43 filehaha.txt
-drwxr-xr-x. 4 root       root       4096 Jul 22 23:44 haha
-drwx------. 5 guoxiaohui guoxiaohui 4096 Jul 28 13:35 xiaofeng
-drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 xixi
-[root@mini1 home]# du -sh *  ## 查看当前文件下所有文件夹以及文件的大小
-4.0K    02xiaofeng
-0       filehaha.txt
-20K     haha
-254M    xiaofeng
-4.0K    xixi
-```
+    | Tasks:   | 80total  | 1 running        | 79 sleeping  | 0 stopped    | 0 zombie   |
+    | -------- | -------- | ---------------- | ------------ | ------------ | ---------- |
+    | 任务信息 | 进程总数 | 正在运行的进程数 | 睡眠的进程数 | 停止的进程数 | 僵尸进程数 |
+
+    | %Cpu(s):      | 0.5 us        | 0.3 sy        | 0.0 ni | 99.2 id       | 0.0 wa | 0.0 hi | 0.0 si | 0.0 st |
+    | ------------- | ------------- | ------------- | ------ | ------------- | ------ | ------ | ------ | ------ |
+    | CPU占用比信息 | 用户态CPU占比 | 内核态CPU占比 |        | 空闲CPU百分比 |        |        |        |        |
+
+    | %Cpu(s):             | 3690232 total | 2755176 free | 142856 used        | 792200 buff/cache    |
+    | -------------------- | ------------- | ------------ | ------------------ | -------------------- |
+    | 以KB为单位的内存信息 | 物理内存总量  | 空闲内存总量 | 使用的物理内存总量 | 用作内核缓存的内存量 |
+
+    | KiB Swap:              | 0 total    | 0 free         | 0 used           | 3259148 avail Mem |
+    | ---------------------- | ---------- | -------------- | ---------------- | ----------------- |
+    | 以KB为单位的交换区信息 | 交换区总量 | 空闲交换区总量 | 使用的交换区总量 | 缓冲的交换区总量  |
+
+    继续按 f 显示注释，以及编辑等。。。
+    
+    | **列名** |                      | **含义**                                                     |
+    | -------- | -------------------- | ------------------------------------------------------------ |
+    | PID      | Process Id           | 进程id                                                       |
+    | PPID     | Parent Process pid   | 父进程id                                                     |
+    | RUSER    | Real User Name       | Real user name                                               |
+    | UID      | Effective User Id    | 进程所有者的用户id                                           |
+    | USER     | Effective User Id    | 进程所有者的用户名                                           |
+    | GROUP    | Group Name           | 进程所有者的组名                                             |
+    | TTY      | Controlling Tty      | 启动进程的终端名。不是从终端启动的进程则显示为               |
+    | PR       | Priority             | 优先级                                                       |
+    | NI       | Nice Value           | nice值。负值表示高优先级，正值表示低优先级                   |
+    | P        | Last Used Cpu (SMP)  | 最后使用的CPU，仅在多CPU环境下有意义                         |
+    | %CPU     | CPU Usage            | 上次更新到现在的CPU时间占用百分比                            |
+    | TIME     | CPU Time             | 进程使用的CPU时间总计，单位秒                                |
+    | TIME+    | CPU Time, hundredths | 进程使用的CPU时间总计，单位1/100秒                           |
+    | %MEM     | Memory Usage (RES)   | 进程使用的物理内存百分比                                     |
+    | VIRT     | Virtual Image (KiB)  | 进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES                |
+    | SWAP     |                      | 进程使用的虚拟内存中，被换出的大小，单位kb                   |
+    | RES      | Resident Size (KiB)  | 进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA    |
+    | CODE     | Code Size (KiB)      | 可执行代码占用的物理内存大小，单位kb                         |
+    | DATA     | Data+Stack (KiB)     | 可执行代码以外的部分(数据段+栈)占用的物理内存大小，单位kb    |
+    | SHR      | Shared Memory (KiB)  | 共享内存大小，单位kb                                         |
+    | nFLT     | Swapped Size (KiB)   | 页面错误次数                                                 |
+    | nDRT     | Dirty Pages Count    | 最后一次写入到现在，被修改过的页面数。                       |
+    | S        | Process Status       | 进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程 |
+    | COMMAND  | Command Name/Line    | 命令名/命令行                                                |
+    | WCHAN    | Sleeping in Function | 若该进程在睡眠，则显示睡眠中的系统函数名                     |
+    | Flags    | Task Flags <sched.h> | 任务标志                                                     |
+    
+    
+
+* **free**
+
+  * -h：以GB显示
+  * -m：以MB显示
+  * -k：以KB显示
+
+* **df**：查看整体的哦
+
+  ```shell
+  [root@SYSOPS00074145 practice]# df -h ## 文件系统的磁盘使用情况统计 
+  [root@mini1 mypractice]# df -h
+  Filesystem            Size  Used Avail Use% Mounted on
+  /dev/mapper/vg_mini1-lv_root
+                         18G  7.1G  9.3G  44% /
+  tmpfs                 1.5G  432K  1.5G   1% /dev/shm
+  /dev/sda1             477M   37M  415M   9% /boot
+  /dev/sr0              3.7G  3.7G     0 100% /media/CentOS_6.7_Final
+  ```
+
+* **du**：查看细节的哦
+
+  ```shell
+  [root@mini1 home]# ll
+  total 16
+  drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 02xiaofeng
+  -rw-r--r--. 1 root       root          0 Jul 30 23:43 filehaha.txt
+  drwxr-xr-x. 4 root       root       4096 Jul 22 23:44 haha
+  drwx------. 5 guoxiaohui guoxiaohui 4096 Jul 28 13:35 xiaofeng
+  drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 xixi
+  [root@mini1 home]# du -sh *  ## 查看当前文件下所有文件夹以及文件的大小
+  4.0K    02xiaofeng
+  0       filehaha.txt
+  20K     haha
+  254M    xiaofeng
+  4.0K    xixi
+  ```
 
 ###  uniq;sort
 

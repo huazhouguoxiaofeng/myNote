@@ -36,6 +36,7 @@ su xiaofeng
 ```shell
 vi elasticsearch-7.2.0/bin
 ./elasticsearch
+./elasticsearch -d ## 后台启动
 ```
 
 六）kibana
@@ -55,6 +56,8 @@ vi elasticsearch-7.2.0/bin
    * 超时时间：elasticsearch.requestTimeout: 40000
 
 4. 启动：./kibana-7.2.0-linux-x86_64/bin/kibana
+
+   后台启动：nohup ./kibana &
 
 ### 集群
 
@@ -113,9 +116,324 @@ elasticsearch.hosts: ["http://localhost:9200","http://localhost:9201","http://lo
 
 
 
+### index
+
+说白了就是个数据库
+
+```json
+PUT nba
+GET nba
+GET nab,nba ## 批量请求
+GET _all ## 获取所有
+DELETE nba
+```
+
+```json
+GET _cluster/settings ## 查看是否自动创建索引，默认为true
+PUT _cluster/settings ## 设置为false
+{
+ "persistent": {
+ 	"action.auto_create_index": "false"
+ }
+}
+
+```
 
 
 
+```shell
+GET _cat/indices?v ## 查看是否健康
+```
+
+### mapping
+
+说白了就是数据库表结构
+
+```json
+PUT nab/_mapping ## 新增，也可以是修改，注意对应的 text 或者 Key 不能改，否则报错
+{
+  "properties": {
+    "name": {
+      "type": "text"
+    },
+    "team_name": {
+      "type": "text"
+    },
+    "position": {
+      "type": "keyword"
+    },
+    "play_year": {
+      "type": "keyword"
+    },
+    "jerse_no": {
+      "type": "keyword"
+    }
+  }
+}
+```
+
+```json
+GET nab/_mapping
+GET nab,nba/_mapping  ## 批量请求
+GET _mapping ## 获取所有
+GET _all/_mapping ## 获取所有
+```
+
+### doc
+
+说白了就是数据库的行记录
+
+```json
+PUT nab/_doc/1 ## 后面不带1的话就不指定索引
+{
+  "name": "哈登",
+  "team_name": "⽕箭",
+  "position": "得分后卫",
+  "play_year": "10",
+  "jerse_no": "13"
+}
+```
+
+```json
+DELETE nab/_doc/2
+
+GET nab/_doc/1
+
+GET nab/_doc/_mget ## 同时获取多个
+{
+  "docs": [
+    {
+      "_index": "nab",
+      "_type": "_doc",
+      "_id": "1"
+    },
+    {
+      "_index": "nab",
+      "_type": "_doc",
+      "_id": "2"
+    }
+  ]
+}
+## 修改
+POST nab/_doc/2 
+{
+ "name":"杨超越",
+ "team_name":"梦之队",
+ "position":"组织后卫aaaaaa",
+ "play_year":"0",
+ "jerse_no":"18"
+}
+POST nab/_update/2
+{
+  "doc": {
+    "name": "库⾥",
+    "team_name": "勇⼠",
+    "position": "控球后卫",
+    "play_year": 10,
+    "jerse_no": "30",
+    "title": "the best shooter"
+  }
+}
+
+POST nab/_update/2 ## 增加一个字段
+{
+ "script": "ctx._source.age = 20"
+}
+
+POST nab/_update/2 ## 不写死
+{
+  "script": {
+    "source": "ctx._source.age += params.age",
+    "params": {
+      "age": 4
+    }
+  }
+}
+
+POST nab/_update/2 ## 去掉一个字段
+{
+ "script": "ctx._source.remove(\"age\")"
+}
+```
+
+### term
+
+全匹配
+
+```json
+POST nba/_search
+{
+  "query": {
+    "term": {
+      "jerseyNo": "23"
+    }
+  }
+}
+POST nab/_search
+{
+  "query": {
+    "terms": {
+      "jerse_no": ["23","13"]
+    }
+  }
+}
+```
+
+### match_all
+
+全部都搜索出来了
+
+```json
+POST nab/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 0,
+  "size": 20
+}
+```
+
+### match
+
+模糊匹配
+
+```json
+POST nab/_search
+{
+  "query": {
+    "match": {
+      "position": "后卫"
+    }
+  }
+}
+```
+
+### multi_match
+
+title 和 name，凡是有shooter的，都找出来
+
+```json
+POST nab/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "shooter",
+      "fields": ["title","name"]
+    }
+  }
+}
+```
+
+match_phrase
+
+查出得分后卫和控球后卫
+
+```json
+POST nab/_search
+{
+  "query": {
+    "match_phrase": {
+      "position": "后卫"
+    }
+  }
+}
+```
+
+### match_phrase_prefix
+
+最左匹配原则
+
+```json
+POST nab/_search
+{
+  "query": {
+    "match_phrase_prefix": {
+      "title": "the best s"
+    }
+  }
+}
+```
+
+### range
+
+* g: greate
+* t: than
+* e: equal
+* l: less
+
+```json
+POST nba/_search
+{
+  "query": {
+    "range": {
+      "playYear": {
+        "gte": 2,
+        "lte": 10
+      }
+    }
+  }
+}
+## 好似birthDayStr的type类型一定要是date
+POST nba/_search
+{
+  "query": {
+    "range": {
+      "birthDayStr": {
+        "gte": "01/01/1999",
+        "lte": "01/01/2022",
+        "format": "dd/MM/yyyy"
+      }
+    }
+  }
+}
+```
+
+### sort
+
+首先要查出是火箭队的嘛
+
+```json
+POST nba/_search
+{
+  "query": {
+    "match": {
+      "teamNameEn": "Rockets"
+    }
+  },
+  "sort": [
+    {
+      "playYear": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+```
+
+max,min,sum,avg
+
+* aggs：表示是聚合
+* avgAge：表示是到时候要显示的字段名
+* avg：表示是求平均值
+
+```json
+POST /nba/_search
+{
+  "query": {
+    "match": {
+      "teamNameEn": "Rockets"
+    }
+  },
+  "aggs": {
+    "avgAge": {
+      "avg": {
+        "field": "age"
+      }
+    }
+  }
+}
+```
 
 
 
