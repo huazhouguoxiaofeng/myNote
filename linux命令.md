@@ -86,23 +86,25 @@ xiaofeng01
 root
 ```
 
-###  cd;ls
+###  cd
 
 ```shell
 cd ~      ## 切换到用户主目录
 cd  ## 什么路径都不带，则回到当前用户的主目录（比如当前用户是root，所以就回到/root，如果当前用户是xiaofeng01，所以就到/home/xiaofeng01目录去）
 cd -  ## 回退到上次所在的目录
+```
 
-## ls 默认按照文件名排序
-ls -lt    ## 时间降序排序
-ls -lrt   ## 时间升序排序
-ls -a     ## 显示出隐藏文件、
-ls -lh    ## 人类可看的大小
-ls -la
--l  长列表
--t  时间顺序，最新的在最前面
--r  -t的reverse
+### ls
 
+默认按照文件名排序
+
+	* -l：use a long listing format
+	* -t：time, sort by modification time, newest first
+	* -r：reverse order while sorting，例如：-lrt
+ * -h：--human-readable       with -l, print sizes in human readable format (e.g., 1K 234M 2G)。 好像只能看文件的大小，文件夹不准确
+	* -d：--directory            list directories themselves, not their contents
+
+```shell
 ## 当前列表文件筛选
 ls -lrt *pop3*
 ls -lrt | grep *pop3*
@@ -129,9 +131,9 @@ rm -rf *.xml *.txt  ## 删除所有后缀名为xml以及txt 的文件
 
 + cp
 
-    + -r：复制目录的时候，表示递归recusive，
+    + -r：复制目录的时候，表示递归recusive（反正没有这个就不给复制）
     + -f：覆盖已经存在的目标文件而不给出提示。
-    + -a：复制目录后其文件属性会发生变化，想要使得复制之后的目录和原目录完全一样（文件权限等），可以加 -a
+    + -a：复制目录后其文件属性会发生变化，想要使得复制之后的目录和原目录完全一样（权限、修改时间等），可以加 -a
 
  + mv
 
@@ -186,7 +188,7 @@ wq! #强制离开并保存
 ```shell
 grep 'fffff' 123.txt   ## 筛选
 grep -n 'fffff' 123.txt ## -n 显示行数
-grep -w 'fffff' 123.txt ## -w 精确匹配
+grep -w 'fffff' 123.txt ## -w 精确匹配(好似默认就是精确匹配了）
 grep -i 'fffff' 123.txt ## -i 忽略大小写
 grep -v 'fffff' 123.txt ## -v 反向选择
 grep 'fffff' 123.txt | wc -l ## 管道
@@ -333,13 +335,26 @@ cat /etc/passwd | grep '/bin/bash' | cut -d ':' -f 1 | grep -v root
 + p #以行为单位进行打印，通常与-n一起使用
 
 1. 打印出第二行：df -h | sed -n '2p'
+
 2. 删除第二行：df -h | sed '2d' 
+
 3. a #在行的下面插入新的内容：df -h | sed '2a 1234567890' 
+
 4. i #在行的上面插入新的内容：df -h | sed '2i 1234567890'
+
 5. c #替换：df -h | sed '2c 1234567890' 
+
 6. 指定字符串替换：s/要被取代的内容/新的字符串/g #指定内容进行替换：df -h | sed 's/centos-root/Centos7/g'
+
 7. 在文件中模糊搜索tmpfs：sed -n '/tmpfs/p' df.txt （ grep  tmpfs 123.txt ）
-8. -e #表示可以执行多条动作：sed -e 's/18/188/g' -e 's/477/488/g' 123.txt > 444.txt（替换18为188，替换477位488），并输出所在行
+
+8. -e #表示可以执行多条动作：sed -e 's/18/188/g' -e 's/477/488/g' 123.txt > 444.txt（替换18为188，替换477位488），并输出所在行\
+
+   ```shell
+    sed -n '15650,15750p' Landray.log  ## 打印 15650 到 15750行到屏幕
+   ```
+
+   
 
 ### crond
 
@@ -814,7 +829,7 @@ id:5:initdefault:  # 配置默认启动级别
 -p ：指明显示建立相关连接的程序名
 
 ```shell
-[esTest@AliYun config]$ netstat -ntlp
+[esTest@AliYun config]$ netstat -ntpl
 (Not all processes could be identified, non-owned process info
  will not be shown, you would have to be root to see it all.)
 Active Internet connections (only servers)
@@ -823,7 +838,7 @@ tcp        0      0 0.0.0.0:9200            0.0.0.0:*               LISTEN      
 tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
 tcp        0      0 0.0.0.0:9300            0.0.0.0:*               LISTEN      4612/java           
 tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
-[esTest@AliYun config]$ netstat -ntlpu
+[esTest@AliYun config]$ netstat -ntplu
 (Not all processes could be identified, non-owned process info
  will not be shown, you would have to be root to see it all.)
 Active Internet connections (only servers)
@@ -1329,3 +1344,19 @@ db_password=cx12345678
 $mysql_home/bin/mysql -P$db_port -h$db_host -u$db_user -p$db_password
 ```
 
+oracle 启动
+
+```shell
+## 注意一定要以这样的方式启动，否则执行命令报 找不到命令
+su - oracle ## 切换成oracle数据库
+lsnrctl start ## 启动oracle监听器
+sqlplus / as sysdba ## 以oracle方式登录
+sql>startup ## 启动oracle
+--------------------------------
+ps -ef | grep tnslsnr  ## 查看oracle进程
+lsnrctl status
+```
+
+服务器启动的自启动服务
+
+![image-20210628142931848](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210628142931848.png)
