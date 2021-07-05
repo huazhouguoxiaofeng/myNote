@@ -13,6 +13,7 @@ lsb_release -a  ## 查看服务器信息
 + rz/sz：yum install lrzsz
 + gcc：yum install -y gcc-c++
 + netstat：yum -y install net-tools
++ zip：yum install zip
 
 ###  diff;man;pwd;--help;echo
 
@@ -21,6 +22,7 @@ diff 123.txt 456.txt   # 差异
 man  ## 查看帮助文档  (一般外部命令用这个)
 pwd ## 查看当前所在的工作目录的全路径
 ls --help ## 授之预渔(一般内部命令用这个) 
+
 
 [root@mini1 ~]# a="是发放"
 [root@mini1 ~]# echo a
@@ -127,7 +129,7 @@ rm -rf *.xml *.txt  ## 删除所有后缀名为xml以及txt 的文件
 
  + touch
 
-     + 创建文件haha：touch haha
+     + touch haha：假如不存在，就创建该文件，假如存在，就修改该时间
 
 + cp
 
@@ -384,11 +386,15 @@ crontab -r #删除crontab里的所有任务
 
 ###  重定向
 
+> /dev/stdin 0 标准输入（默认，不填写就代表这个）
+> /dev/stdout 1 标准输出
+> /dev/stderr 2 标准错误输出
+
+
+
 ```shell
-posix名称 文件描述符 用途
-/dev/stdin 0 标准输入（默认，不填写就代表这个）
-/dev/stdout 1 标准输出
-/dev/stderr 2 标准错误输出
+> 就是覆盖
+>> 就是追加
 
 ## 进入编辑页面，然后你所输入的文字将覆盖这个文件
 	cat > 123.txt 
@@ -402,6 +408,7 @@ posix名称 文件描述符 用途
 	llll 2> 123.txt
 ## 错误输出重定向：llll 这个命令错误，将这个错误命令信息打印追加到 123.txt 这个文件
 	llll 2>> 123.txt
+	
 ## ;代表的是可以执行多条命令；例如这个例子，把这个东东合并输出
 	[root@mini1 mypractice]# cat a1.txt ;cat a2.txt 
 ## &&：前面的命令执行成功的话，后面的才可以执行成功；前面的命令执行失败的话，后面的不可以执行
@@ -478,13 +485,13 @@ posix名称 文件描述符 用途
 
 ```shell
 .tar.gz 
-解压：tar zxvf FileName.tar.gz  
+解压到当前文件夹：tar zxvf FileName.tar.gz  
 解压到指定文件夹：tar -zxvf jdk-8u181-linux-x64.tar.gz -C /usr/local  ## 注意 -C ，redis练习就是用这个
 压缩：tar zcvf FileName.tar.gz DirName 
 --------------------------------------------- 
 .zip
-解压：unzip FileName.zip ## 顺丰就是用这个
-压缩：zip FileName.zip DirName 
+解压：unzip FileName.zip ## 顺丰就是用这个  unzip –o update2020.zip –d ekp
+压缩：zip FileName.zip DirName ## 文件夹要 -r
 --------------------------------------------- 
 .tar
 压缩：tar cvf FileName.tar FileName
@@ -903,51 +910,15 @@ sar -n DEV （查看全天）
 sar -n DEV 1 2 （1：每隔一秒，2：写入2次）
 ```
 
-###  ps：查看进程
-
-process status 的缩写
+###  ps：process status
 
 ```shell
-## 打印当前所有进程
-ps -ef 
-## 举 例：
 ps -ef | grep nginx 
 ps -aux | grep nginx 
 ps -aux | more  ## 这样的话，就连接起来分页查看了嘛
 ps -ef | more ## 这样的话，就连接起来分页查看了嘛
-```
+ps -ef | head -n 5 ## 显示前面5条数据
 
-+ UID：用户ID
-+ PID：进程ID
-+ PPID：父进程号 
-+ C：CPU的占用率 
-+ STIME：进程的启动时间 
-+ TTY：TTY终端 
-+ TIME：进程执行起到现在总的CPU占用时间 
-+ CMD：启动这个进程的命令 
-
-```shell
-[root@mini1 aaa]# ps -ef | head -n 5
-UID         PID   PPID  C STIME TTY          TIME CMD
-root          1      0  0 Nov18 ?        00:00:01 /sbin/init
-root          2      0  0 Nov18 ?        00:00:00 [kthreadd]
-root          3      2  0 Nov18 ?        00:00:00 [migration/0]
-root          4      2  0 Nov18 ?        00:00:00 [ksoftirqd/0]
-```
-
-+ USER：哪个用户启动了这个命令
-+ PID：进程的ID 
-+ %CPU：CPU的占用率 
-+ %MEM：内存的使用率
-+ VSZ：如果一个程序完全驻留在内存中一共需要使用多少内存空间 
-+ RSS：进程当前占用了多少内存 
-+ TTY：tty终端
-+ STAT：表示当前进程的状态（S#处于休眠的状态；D#不可中断的状态 ；Z#僵尸进程 ；X#死掉的进程） 
-+ START：启动这个命令的时间点
-+ TIME：进程执行起到现在总的CPU占用时间 
-+ COMMAND：启动这个进程的命令
-
-```shell
 [root@mini1 aaa]# ps -aux | head -n 5
 Warning: bad syntax, perhaps a bogus '-'? See /usr/share/doc/procps-3.2.8/FAQ
 USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
@@ -962,6 +933,18 @@ apache     2025   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd ## /usr/sbin/h
 apache     2027   2020  0 10:11 ?        00:00:00 /usr/sbin/httpd
 root       2310   2245  0 10:29 pts/0    00:00:00 grep httpd
 ```
+
+ps -ef 控制台
+
+| UID     | PID        | PPID              | C           | STIME          | TTY     |
+| ------- | ---------- | ----------------- | ----------- | -------------- | ------- |
+| user id | process id | parent process id | CPU utility | 进程的启动时间 | TTY终端 |
+
+ps -aux 控制台
+
+| USER | PID  | %CPU        | %MEM           | VSZ                                                  | RSS                    | TTY     | STAT                                                         | START                | TIME                            | COMMAND            |
+| ---- | ---- | ----------- | -------------- | ---------------------------------------------------- | ---------------------- | ------- | ------------------------------------------------------------ | -------------------- | ------------------------------- | ------------------ |
+| UID  |      | CPU utility | memory utility | 如果一个程序完全驻留在内存中一共需要使用多少内存空间 | 进程当前占用了多少内存 | tty终端 | 表示当前进程的状态（S#处于休眠的状态；D#不可中断的状态 ；Z#僵尸进程 ；X#死掉的进程） | 启动这个命令的时间点 | 进程执行起到现在总的CPU占用时间 | 启动这个进程的命令 |
 
 ###  free;top;df;du
 
@@ -1355,6 +1338,7 @@ sql>startup ## 启动oracle
 --------------------------------
 ps -ef | grep tnslsnr  ## 查看oracle进程
 lsnrctl status
+lsnrctl stop
 ```
 
 服务器启动的自启动服务
