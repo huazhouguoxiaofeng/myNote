@@ -13,7 +13,6 @@ lsb_release -a  ## 查看服务器信息
 + rz/sz：yum install lrzsz
 + gcc：yum install -y gcc-c++
 + netstat：yum -y install net-tools
-+ zip：yum install zip
 
 ###  diff;man;pwd;--help;echo
 
@@ -31,11 +30,10 @@ a
 是发放
 
 ## 打印当前进程号
-[root@mini1 mypractice]# echo $$
-29514
+echo $$
 ```
 
-###  date;cal;日期校准
+###  date;cal;日期校准;last
 
 ```shell
 [root@mini1 ~]# date
@@ -51,28 +49,16 @@ Sat Aug 18 10:55:16 CST 2018
 
 cal  ## 这个命令很有意思哦
 cal 2018 ## 这个命令很有意思哦
+```
 
+日期校准
+
+```
 yum install ntpdate
 ntpdate ntp1.aliyun.com
 ```
 
-###  last
-
-```shell
-[root@mini1 ~]# last -3
-root     pts/0        192.168.174.1    Sat Aug 18 10:12   still logged in   
-root     tty1                          Sat Aug 18 10:12   still logged in   
-reboot   system boot  2.6.32-573.el6.x Sat Aug 18 10:11 - 11:00  (00:49)    
-
-wtmp begins Sat Jul 14 21:42:45 2018
-[root@mini1 ~]# last -4
-root     pts/0        192.168.174.1    Sat Aug 18 10:12   still logged in   
-root     tty1                          Sat Aug 18 10:12   still logged in   
-reboot   system boot  2.6.32-573.el6.x Sat Aug 18 10:11 - 11:00  (00:49)    
-root     pts/0        192.168.174.1    Sat Aug 18 00:51 - 01:02  (00:11)    
-
-wtmp begins Sat Jul 14 21:42:45 2018
-```
+last：过去n个的登录信息
 
 ###  who;id;whoami 
 
@@ -91,8 +77,8 @@ root
 ###  cd
 
 ```shell
-cd ~      ## 切换到用户主目录
-cd  ## 什么路径都不带，则回到当前用户的主目录（比如当前用户是root，所以就回到/root，如果当前用户是xiaofeng01，所以就到/home/xiaofeng01目录去）
+cd ~  ## 家目录
+cd ## 家目录，哈哈，肯定是用这个的啦
 cd -  ## 回退到上次所在的目录
 ```
 
@@ -100,30 +86,27 @@ cd -  ## 回退到上次所在的目录
 
 默认按照文件名排序
 
-	* -l：use a long listing format
-	* -t：time, sort by modification time, newest first
-	* -r：reverse order while sorting，例如：-lrt
- * -h：--human-readable       with -l, print sizes in human readable format (e.g., 1K 234M 2G)。 好像只能看文件的大小，文件夹不准确
-	* -d：--directory            list directories themselves, not their contents
-
 ```shell
+-l：use a long listing format
+-t：time, sort by modification time, newest first
+-r：reverse order while sorting，例如：-lrt
+-h：--human-readable       with -l, print sizes in human readable format (e.g., 1K 234M 2G)。 好像只能看文件的大小，文件夹不准确
+-d：--directory            list directories themselves, not their contents
 ## 当前列表文件筛选
 ls -lrt *pop3*
 ls -lrt | grep *pop3*
 ```
-
 ###  mkdir;rm
 
 ```shell
-mkdir aaa    ## 这是相对路径的写法
-mkdir  /data   ## 这是绝对路径的写法
 mkdir -p  aaa/bbb/ccc ##  级联创建目录，尼玛这个居然不知道自己有记笔记
 rmdir  aaa  ## 可以删除空目录
-rm  -r  aaa ## 级联删除
-rm  -rf  aaa  ##  强制级联删除aaa
-rm -rf aaa bbb ccc ## 哈哈哈，同时删除aaa,bbb,ccc这些文件夹啊
-rm -rf *.xml *.txt  ## 删除所有后缀名为xml以及txt 的文件
 ```
+
+* rm
+  * Usage: rm [OPTION]... FILE...    
+  * -f, --force           ignore nonexistent files and arguments, never prompt
+  * -r, -R, --recursive   remove directories and their contents recursively
 
 ###  touch;mv;cp;scp
 
@@ -490,54 +473,18 @@ crontab -r #删除crontab里的所有任务
 压缩：tar zcvf FileName.tar.gz DirName 
 --------------------------------------------- 
 .zip
+yum install zip
 解压：unzip FileName.zip ## 顺丰就是用这个  unzip –o update2020.zip –d ekp
 压缩：zip FileName.zip DirName ## 文件夹要 -r
 --------------------------------------------- 
 .tar
 压缩：tar cvf FileName.tar FileName
 解压：tar xvf FileName.tar
---------------------------------------------- 
-.gz
-解压1：gunzip FileName.gz 
-解压2：gzip -d FileName.gz 
-压缩：gzip FileName 
---------------------------------------------- 
-.bz2 
-解压1：bzip2 -d FileName.bz2 
-解压2：bunzip2 FileName.bz2 
-压缩： bzip2 -z FileName 
-.tar.bz2 
-解压：tar jxvf FileName.tar.bz2 
-压缩：tar jcvf FileName.tar.bz2 DirName 
---------------------------------------------- 
-.bz 
-解压1：bzip2 -d FileName.bz 
-解压2：bunzip2 FileName.bz 
-压缩：未知 
-.tar.bz 
-解压：tar jxvf FileName.tar.bz 
-压缩：未知 
---------------------------------------------- 
-.Z 
-解压：uncompress FileName.Z 
-压缩：compress FileName 
-.tar.Z 
-解压：tar Zxvf FileName.tar.Z 
-压缩：tar Zcvf FileName.tar.Z DirName 
---------------------------------------------- 
-.tgz 
-解压：tar zxvf FileName.tgz 
-压缩：未知 
-.tar.tgz 
-解压：tar zxvf FileName.tar.tgz 
-压缩：tar zcvf FileName.tar.tgz FileName 
---------------------------------------------- 
-.rar 
-解压：rar a FileName.rar 
-压缩：rar e FileName.rar
 ```
 
-### find
+### find/history
+
+* find --help
 
 -name 指查找文件名；-type 指要查找的文件类型；-perm  文件权限；-user 所属主
 
@@ -549,10 +496,12 @@ find /home -name sfa*  模糊查找
 find /home -name *fa* 模糊查找
 find /home -type d -name 111  ### d表示目录  
 find /home -type f -name 111  ### f表示文件
-查找可执行的命令所在的路径：which java
-查找可执行的命令和帮助的位置：whereis java
-显示历史命令：history
-histroy | grep srp   查看关于输过srp的历史命令
+```
+
+![509114-20170929180602637-1031376801.png](https://images2017.cnblogs.com/blog/509114/201709/509114-20170929180602637-1031376801.png)
+
+```shell
+histroy | grep srp   ## 查看关于输过srp的历史命令
 ```
 
 ### 软硬链接
