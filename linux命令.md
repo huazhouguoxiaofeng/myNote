@@ -502,6 +502,7 @@ find /home -type f -name 111  ### f表示文件
 
 ```shell
 histroy | grep srp   ## 查看关于输过srp的历史命令
+history | tail -n 10 ## 查看历史命令后10条
 ```
 
 ### 软硬链接
