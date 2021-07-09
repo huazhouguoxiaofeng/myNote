@@ -462,24 +462,43 @@ crontab -r #删除crontab里的所有任务
 
 ###  压缩/解压 
 
-1）tar为打包；压缩的话只能压缩文件，不能压缩文件夹；只测试过前面两三个，后面的没有测试过，只是用来备份记录
+#### tar
 
-2）要区分打包到当前文件夹还是指定文件夹的命令的不同之处
+tar --help
+
+> 指定选项时可以不在选项前面输入“-”。例如，使用“cvf”选项和 “-cvf”起到的作用一样。
+>
+> tar -zxvf(打包后.tar.gz结尾)   这个过程实为两个过程：   tar -xvf(打包后.tar结尾)   +     gzip 
+>
+> tar为打包；压缩的话只能压缩文件，不能压缩文件夹
+
+* -z, --gzip, --gunzip, --ungzip   filter the archive through gzip   说白了就是压缩
+* -x, --extract, --get       extract files from an archive        说白了就是解压
+* -v, --verbose              verbosely list files processed       加上这个参数，解压时就显示压缩文件时的详细目录，压缩时就返回压缩文件的详细目录
+* -f, --file=ARCHIVE         use archive file or device ARCHIVE`    解压时使用压缩文件名
+* -t, --list                 list the contents of an archive            显示压缩文件里面的内容
+* -c, --create               create a new archive
+* -j, --bzip2                filter the archive through bzip2（.tar.bz2；与 -z 相呼应）
 
 ```shell
-.tar.gz 
-解压到当前文件夹：tar zxvf FileName.tar.gz  
-解压到指定文件夹：tar -zxvf jdk-8u181-linux-x64.tar.gz -C /usr/local  ## 注意 -C ，redis练习就是用这个
-压缩：tar zcvf FileName.tar.gz DirName 
---------------------------------------------- 
-.zip
+tar -zxvf FileName.tar.gz  ## 解压到当前文件夹
+tar -zxvf jdk-8u181-linux-x64.tar.gz -C /usr/local  ## 解压到指定文件夹，注意 -C ，redis练习就是用这个
+tar -zcvf FileName.tar.gz DirName... ## 压缩
+tar -ztvf xixi.tar.gz  ## 查看该压缩文件里面的内容
+```
+
+#### zip
+
 yum install zip
+
+zip --help
+
+* -r   recurse into directories
+* -v   verbose operation/print version info
+
+```shell
 解压：unzip FileName.zip ## 顺丰就是用这个  unzip –o update2020.zip –d ekp
 压缩：zip FileName.zip DirName ## 文件夹要 -r
---------------------------------------------- 
-.tar
-压缩：tar cvf FileName.tar FileName
-解压：tar xvf FileName.tar
 ```
 
 ### find/history

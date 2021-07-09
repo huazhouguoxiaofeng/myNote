@@ -14,7 +14,7 @@
 
 2）需要安装maven
 
-3）启动 Name Server 以及 broker 时，`nohup sh bin/mqnamesrv & 是以守护线程的形式启动的，如果启动成功还好，如果启动不成功的话就不怎么舒服了，所以一开始应该以一般形式启动 sh bin/mqnamesrv，可以成功了，在关闭服务器，再以守护线程的形式启动，启动成功之后，可以通过查看日志检查是否成功嘛`
+3）启动 Name Server 以及 broker 时，**nohup sh bin/mqnamesrv &** 是以守护线程的形式启动的，如果启动成功还好，如果启动不成功的话就不怎么舒服了，所以一开始应该以一般形式启动 sh bin/mqnamesrv，可以成功了，在关闭服务器，再以守护线程的形式启动，启动成功之后，可以通过查看日志检查是否成功嘛`
 
 4）启动broker的时候，一般都会报错空间不足，这个时候，在bin目录下面的文件夹里面runbroker.sh以及runserver.sh 里面的内容改为：　　
 
