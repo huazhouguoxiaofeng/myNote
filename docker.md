@@ -35,12 +35,13 @@
 
 ## 容器
 
-* 构建容器：**docker run -itd --name=mycentos centos:7**
+* 基于哪一个镜像启动容器：**docker run -itd --name=mycentos centos:7/imageID**
   * **-i** ：表示以交互模式运行容器（让容器的标准输入保持打开）
   * **-d**：表示后台运行容器，并返回容器ID
   * **-t**：为容器重新分配一个伪输入终端
   * **--name**：为容器指定名称
 * 查看本地所有的容器：**docker ps -a**
+* 得到所有容器id：**docker ps -a -q**
 * 查看本地正在运行的容器：**docker ps**
 * 停止容器：**docker stop CONTAINER_ID / CONTAINER_NAME**
 * 一次性停止所有容器：**docker stop $(docker ps -a -q)**
@@ -54,39 +55,33 @@
 
 ## 复挂
 
-* 从宿主机复制到容器：**docker cp** **宿主机本地路径 容器名字****/ID****：容器路径**
+* 从宿主机复制到容器：**docker cp** **宿主机本地路径 容器名字 /ID：容器路径**
 
   ```shell
   docker cp /root/123.txt mycentos:/home/
   ```
 
-* 从容器复制到宿主机：**docker cp** **容器名字****/ID****：容器路径 宿主机本地路径**
+* 从容器复制到宿主机：**docker cp** **容器名字/ID：容器路径 宿主机本地路径**
 
   ```shell
   docker cp mycentos:/home/456.txt /root
   ```
 
-* 宿主机文件夹挂载到容器里：**docker run -itd -v** **宿主机路径****:****容器路径 镜像****ID**
+* 宿主机文件夹挂载到容器里：**docker run -itd -v  宿主机路径:容器路径 镜像ID**
 
+  -v：表示挂载目录
+  
+  -p：端口映射
+
+  挂载目录后面那个centos:7 是 REPOSITORY:TAG
+  
   ```shell
   docker run -itd -v /root/xdclass/:/home centos:7
   ```
-
+  
   
 
 ## 构建
-
-```shell
-# this is a dockerfile 
-FROM centos:7 
-MAINTAINER XD 123456@qq.com 
-RUN echo "正在构建镜像！！！" 
-WORKDIR /home/xdclass 
-COPY 123.txt /home/xdclass  ## 123.txt  要是相对路径
-RUN yum install -y net-tools
-```
-
-然后执行命令：docker build -t mycentos:v2 .  ## 后面的 . 表示 到当前目录
 
 * FROM：基于哪个镜像
 * MAINTAINER：注明作者
@@ -127,10 +122,10 @@ EXPOSE 8080
 ENTRYPOINT ["/usr/local/tomcat/bin/catalina.sh","run"]
 ```
 
-构建
+构建镜像
 
 ```shell
-docker build -t mycentos:nginx .
+docker build -t mycentos:nginx .   ## 后面的 . 表示 到当前目录
 ```
 
 启动容器：
@@ -166,7 +161,7 @@ RUN sh /usr/local/nginx_install.sh
 EXPOSE 80
 ```
 
-构建
+构建镜像
 
 ```shell
 docker build -t mycentos:nginx .
