@@ -86,15 +86,23 @@ cd -  ## 回退到上次所在的目录
 
 默认按照文件名排序
 
+* -l：use a long listing format
+* -t：time, sort by modification time, newest first
+* -r：reverse order while sorting，例如：-lrt
+* -h：--human-readable       with -l, print sizes in human readable format (e.g., 1K 234M 2G)。 好像只能看文件的大小，文件夹不准确
+* -d：--directory            list directories themselves, not their contents
+* -i, --inode                print the index number of each file
+* -s, --size                 print the allocated size of each file, in blocks
+
 ```shell
--l：use a long listing format
--t：time, sort by modification time, newest first
--r：reverse order while sorting，例如：-lrt
--h：--human-readable       with -l, print sizes in human readable format (e.g., 1K 234M 2G)。 好像只能看文件的大小，文件夹不准确
--d：--directory            list directories themselves, not their contents
 ## 当前列表文件筛选
 ls -lrt *pop3*
 ls -lrt | grep *pop3*
+## wocao这个文件大小为59个字节，但是却占用了4KB的内存空间
+## nginx-1.16.0.tar.gz 这个文件大小为1009KB，但是却占用了1012KB的内存空间 
+[root@aliyun xiaofeng]# ls -lsh wocao nginx-1.16.0.tar.gz 
+1012K -rw-r--r-- 1 root root 1009K Jul 30  2020 nginx-1.16.0.tar.gz
+ 4.0K -rw-r--r-- 4 root root    59 Jul 15 11:41 wocao
 ```
 ###  mkdir;rm
 
@@ -526,41 +534,47 @@ history | tail -n 10 ## 查看历史命令后10条
 
 ### 软硬链接
 
-+ 为文件111（注意一定要是写绝对路径），在 ../bbb 这个路径下面创建一个软链接 222，就类似于桌面快捷方式，一旦源文件：/home/hahahome/aaa/111删掉，就会闪烁
++ 为文件111（注意一定要是写绝对路径），类似于桌面快捷方式
++ 一旦源文件：/home/hahahome/aaa/111删掉，就会闪烁
++ 前面是实体，后面是软连接
++ inode号不一样
++ 111：所以这个软链接大小3个字节
 
-```sh
-ln -s  /home/hahahome/aaa/111 ../bbb/222  ## /home/hahahome/aaa
-222 -> /home/hahahome/aaa/111 ## ../bbb
+```shell
+ln -s  /home/hahahome/aaa/111 ../bbb/222  ## 在 ../bbb 这个路径下面创建一个软链接 222
 ```
 
- + 为文件111（注意一定要是写绝对路径），在 ../bbb 这个路径下面创建一个软链接 222，111 和 222 都是一个变量，他们的地位相等，都指向底层的一个对象，删除其中谁谁谁都没有关系。他们的Inode号一样。常用于防止重要文件被误删
+![image-20210715094930626](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210715094930626.png)
+
+ + 为文件111（注意一定要是写绝对路径），在 ../bbb 这个路径下面创建一个硬链接 222，111 和 222 都是一个变量，他们的地位相等，都指向底层的一个对象，删除其中谁谁谁都没有关系。他们的Inode号一样。
+
+ + 常用于防止重要文件被误删
+
+ + 不能硬链接目录
 
    ```shell
-   [root@mini1 aaa]# ln  /home/hahahome/aaa/111 ../bbb/222
-   [root@mini1 aaa]# stat 111
-     File: `111'
-     Size: 0               Blocks: 0          IO Block: 4096   regular empty file
-   Device: fd00h/64768d    Inode: 282021      Links: 2
-   Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
-   Access: 2020-11-19 02:16:20.108344869 +0800
-   Modify: 2020-11-19 02:16:20.108344869 +0800
-   Change: 2020-11-19 02:16:25.016344645 +0800
-   [root@mini1 aaa]# cd ../bbb
-   [root@mini1 bbb]# ll
-   total 0
-   -rw-r--r--. 2 root root 0 Nov 19 02:16 222
-   [root@mini1 bbb]# stat 222
-     File: `222'
-     Size: 0               Blocks: 0          IO Block: 4096   regular empty file
-   Device: fd00h/64768d    Inode: 282021      Links: 2
-   Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
-   Access: 2020-11-19 02:16:20.108344869 +0800
-   Modify: 2020-11-19 02:16:20.108344869 +0800
-   Change: 2020-11-19 02:16:25.016344645 +0800
-   [root@mini1 bbb]# ls -li
-   total 0
-   282021 -rw-r--r--. 2 root root 0 Nov 19 02:16 222
+   ## 在 ../bbb 这个路径下面创建一个软链接 222
+   [root@mini1 aaa]# ln  /home/hahahome/aaa/111 ../bbb/222  
    ```
+   
+   ![image-20210715094844094](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210715094844094.png)
+
+### stat
+
+访问修改时间、大小、inode号等
+
+```shell
+## Links: 2  包括自己两个硬链接在里面
+[root@mini1 aaa]# stat 111
+  File: `111'
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: fd00h/64768d    Inode: 282021      Links: 2
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2020-11-19 02:16:20.108344869 +0800
+Modify: 2020-11-19 02:16:20.108344869 +0800
+Change: 2020-11-19 02:16:25.016344645 +0800
+```
+
 ### 权限
 
 ####  文件权限
@@ -915,110 +929,147 @@ ps -aux 控制台
 | ---- | ---- | ----------- | -------------- | ---------------------------------------------------- | ---------------------- | ------- | ------------------------------------------------------------ | -------------------- | ------------------------------- | ------------------ |
 | UID  |      | CPU utility | memory utility | 如果一个程序完全驻留在内存中一共需要使用多少内存空间 | 进程当前占用了多少内存 | tty终端 | 表示当前进程的状态（S#处于休眠的状态；D#不可中断的状态 ；Z#僵尸进程 ；X#死掉的进程） | 启动这个命令的时间点 | 进程执行起到现在总的CPU占用时间 | 启动这个进程的命令 |
 
-###  free;top;df;du
+###  空间
 
-* **top**：监控Linux系统状况，比如cpu、内存的使用；按住键盘q退出
+#### **top**
 
-  * o：sort，排序
-  * d：单位为秒，显示的页面多久更新一次，默认3秒
+监控Linux系统状况，比如cpu、内存的使用；按住键盘q退出
 
-  ```shell
-  top -o +%MEM ## 内存从大到小查看
-  top -o +%CPU ## CPU从大道小查看
-  top -d 5 ## 5秒刷新一次页面
-  ```
+* o：sort，排序
+* d：单位为秒，显示的页面多久更新一次，默认3秒
 
-  * ![image-20210615155240945](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210615155240945.png)
+```shell
+top -o +%MEM ## 内存从大到小查看
+top -o +%CPU ## CPU从大道小查看
+top -d 5 ## 5秒刷新一次页面
+```
 
-    | 15:52:17 | up 1 day, 23:46  | 2 users                                                  | load average: 0.00, 0.02, 0.05                               |
-    | -------- | ---------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
-    | 当前时间 | 该服务器运行时间 | 当前用户登录数。<br />多少个窗口，多少个用户，相同的也算 | 系统负载，即任务队列的平均长度。<br />三个数值分别为 1分钟、5分钟、15分钟前到现在的平均值。<br />如果这个数除以逻辑CPU的数量，结果高于5的时候表明系统在超负荷运转 |
+* ![image-20210615155240945](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210615155240945.png)
 
-    | Tasks:   | 80total  | 1 running        | 79 sleeping  | 0 stopped    | 0 zombie   |
-    | -------- | -------- | ---------------- | ------------ | ------------ | ---------- |
-    | 任务信息 | 进程总数 | 正在运行的进程数 | 睡眠的进程数 | 停止的进程数 | 僵尸进程数 |
+  | 15:52:17 | up 1 day, 23:46  | 2 users                                                  | load average: 0.00, 0.02, 0.05                               |
+  | -------- | ---------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+  | 当前时间 | 该服务器运行时间 | 当前用户登录数。<br />多少个窗口，多少个用户，相同的也算 | 系统负载，即任务队列的平均长度。<br />三个数值分别为 1分钟、5分钟、15分钟前到现在的平均值。<br />如果这个数除以逻辑CPU的数量，结果高于5的时候表明系统在超负荷运转 |
 
-    | %Cpu(s):      | 0.5 us        | 0.3 sy        | 0.0 ni | 99.2 id       | 0.0 wa | 0.0 hi | 0.0 si | 0.0 st |
-    | ------------- | ------------- | ------------- | ------ | ------------- | ------ | ------ | ------ | ------ |
-    | CPU占用比信息 | 用户态CPU占比 | 内核态CPU占比 |        | 空闲CPU百分比 |        |        |        |        |
+  | Tasks:   | 80total  | 1 running        | 79 sleeping  | 0 stopped    | 0 zombie   |
+  | -------- | -------- | ---------------- | ------------ | ------------ | ---------- |
+  | 任务信息 | 进程总数 | 正在运行的进程数 | 睡眠的进程数 | 停止的进程数 | 僵尸进程数 |
 
-    | %Cpu(s):             | 3690232 total | 2755176 free | 142856 used        | 792200 buff/cache    |
-    | -------------------- | ------------- | ------------ | ------------------ | -------------------- |
-    | 以KB为单位的内存信息 | 物理内存总量  | 空闲内存总量 | 使用的物理内存总量 | 用作内核缓存的内存量 |
+  | %Cpu(s):      | 0.5 us        | 0.3 sy        | 0.0 ni | 99.2 id       | 0.0 wa | 0.0 hi | 0.0 si | 0.0 st |
+  | ------------- | ------------- | ------------- | ------ | ------------- | ------ | ------ | ------ | ------ |
+  | CPU占用比信息 | 用户态CPU占比 | 内核态CPU占比 |        | 空闲CPU百分比 |        |        |        |        |
 
-    | KiB Swap:              | 0 total    | 0 free         | 0 used           | 3259148 avail Mem |
-    | ---------------------- | ---------- | -------------- | ---------------- | ----------------- |
-    | 以KB为单位的交换区信息 | 交换区总量 | 空闲交换区总量 | 使用的交换区总量 | 缓冲的交换区总量  |
+  | %Cpu(s):             | 3690232 total | 2755176 free | 142856 used        | 792200 buff/cache    |
+  | -------------------- | ------------- | ------------ | ------------------ | -------------------- |
+  | 以KB为单位的内存信息 | 物理内存总量  | 空闲内存总量 | 使用的物理内存总量 | 用作内核缓存的内存量 |
 
-    继续按 f 显示注释，以及编辑等。。。
-    
-    | **列名** |                      | **含义**                                                     |
-    | -------- | -------------------- | ------------------------------------------------------------ |
-    | PID      | Process Id           | 进程id                                                       |
-    | PPID     | Parent Process pid   | 父进程id                                                     |
-    | RUSER    | Real User Name       | Real user name                                               |
-    | UID      | Effective User Id    | 进程所有者的用户id                                           |
-    | USER     | Effective User Id    | 进程所有者的用户名                                           |
-    | GROUP    | Group Name           | 进程所有者的组名                                             |
-    | TTY      | Controlling Tty      | 启动进程的终端名。不是从终端启动的进程则显示为               |
-    | PR       | Priority             | 优先级                                                       |
-    | NI       | Nice Value           | nice值。负值表示高优先级，正值表示低优先级                   |
-    | P        | Last Used Cpu (SMP)  | 最后使用的CPU，仅在多CPU环境下有意义                         |
-    | %CPU     | CPU Usage            | 上次更新到现在的CPU时间占用百分比                            |
-    | TIME     | CPU Time             | 进程使用的CPU时间总计，单位秒                                |
-    | TIME+    | CPU Time, hundredths | 进程使用的CPU时间总计，单位1/100秒                           |
-    | %MEM     | Memory Usage (RES)   | 进程使用的物理内存百分比                                     |
-    | VIRT     | Virtual Image (KiB)  | 进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES                |
-    | SWAP     |                      | 进程使用的虚拟内存中，被换出的大小，单位kb                   |
-    | RES      | Resident Size (KiB)  | 进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA    |
-    | CODE     | Code Size (KiB)      | 可执行代码占用的物理内存大小，单位kb                         |
-    | DATA     | Data+Stack (KiB)     | 可执行代码以外的部分(数据段+栈)占用的物理内存大小，单位kb    |
-    | SHR      | Shared Memory (KiB)  | 共享内存大小，单位kb                                         |
-    | nFLT     | Swapped Size (KiB)   | 页面错误次数                                                 |
-    | nDRT     | Dirty Pages Count    | 最后一次写入到现在，被修改过的页面数。                       |
-    | S        | Process Status       | 进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程 |
-    | COMMAND  | Command Name/Line    | 命令名/命令行                                                |
-    | WCHAN    | Sleeping in Function | 若该进程在睡眠，则显示睡眠中的系统函数名                     |
-    | Flags    | Task Flags <sched.h> | 任务标志                                                     |
-    
-    
+  | KiB Swap:              | 0 total    | 0 free         | 0 used           | 3259148 avail Mem |
+  | ---------------------- | ---------- | -------------- | ---------------- | ----------------- |
+  | 以KB为单位的交换区信息 | 交换区总量 | 空闲交换区总量 | 使用的交换区总量 | 缓冲的交换区总量  |
 
-* **free**
+  继续按 f 显示注释，以及编辑等。。。
+  
+  | **列名** |                      | **含义**                                                     |
+  | -------- | -------------------- | ------------------------------------------------------------ |
+  | PID      | Process Id           | 进程id                                                       |
+  | PPID     | Parent Process pid   | 父进程id                                                     |
+  | RUSER    | Real User Name       | Real user name                                               |
+  | UID      | Effective User Id    | 进程所有者的用户id                                           |
+  | USER     | Effective User Id    | 进程所有者的用户名                                           |
+  | GROUP    | Group Name           | 进程所有者的组名                                             |
+  | TTY      | Controlling Tty      | 启动进程的终端名。不是从终端启动的进程则显示为               |
+  | PR       | Priority             | 优先级                                                       |
+  | NI       | Nice Value           | nice值。负值表示高优先级，正值表示低优先级                   |
+  | P        | Last Used Cpu (SMP)  | 最后使用的CPU，仅在多CPU环境下有意义                         |
+  | %CPU     | CPU Usage            | 上次更新到现在的CPU时间占用百分比                            |
+  | TIME     | CPU Time             | 进程使用的CPU时间总计，单位秒                                |
+  | TIME+    | CPU Time, hundredths | 进程使用的CPU时间总计，单位1/100秒                           |
+  | %MEM     | Memory Usage (RES)   | 进程使用的物理内存百分比                                     |
+  | VIRT     | Virtual Image (KiB)  | 进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES                |
+  | SWAP     |                      | 进程使用的虚拟内存中，被换出的大小，单位kb                   |
+  | RES      | Resident Size (KiB)  | 进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA    |
+  | CODE     | Code Size (KiB)      | 可执行代码占用的物理内存大小，单位kb                         |
+  | DATA     | Data+Stack (KiB)     | 可执行代码以外的部分(数据段+栈)占用的物理内存大小，单位kb    |
+  | SHR      | Shared Memory (KiB)  | 共享内存大小，单位kb                                         |
+  | nFLT     | Swapped Size (KiB)   | 页面错误次数                                                 |
+  | nDRT     | Dirty Pages Count    | 最后一次写入到现在，被修改过的页面数。                       |
+  | S        | Process Status       | 进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程 |
+  | COMMAND  | Command Name/Line    | 命令名/命令行                                                |
+  | WCHAN    | Sleeping in Function | 若该进程在睡眠，则显示睡眠中的系统函数名                     |
+  | Flags    | Task Flags <sched.h> | 任务标志                                                     |
+  
+  
 
-  * -h：以GB显示
-  * -m：以MB显示
-  * -k：以KB显示
+#### **free**
 
-* **df**：查看整体的哦
+显示内存信息
 
-  ```shell
-  [root@SYSOPS00074145 practice]# df -h ## 文件系统的磁盘使用情况统计 
-  [root@mini1 mypractice]# df -h
-  Filesystem            Size  Used Avail Use% Mounted on
-  /dev/mapper/vg_mini1-lv_root
-                         18G  7.1G  9.3G  44% /
-  tmpfs                 1.5G  432K  1.5G   1% /dev/shm
-  /dev/sda1             477M   37M  415M   9% /boot
-  /dev/sr0              3.7G  3.7G     0 100% /media/CentOS_6.7_Final
-  ```
+我们需要解释一下 buffers（缓冲）和 cached（缓存）的区别。简单来讲，cached 是给读取数据时加速的，buffers  是给写入数据加速的。cached  是指把读取出来的数据保存在内存中，当再次读取时，不用读取硬盘而直接从内存中读取，加速了数据的读取过程；buffers  是指在写入数据时，先把分散的写入操作保存到内存中，当达到一定程度后再集中写入硬盘，减少了磁盘碎片和硬盘的反复寻道，加速了数据的写入过程。
 
-* **du**：查看细节的哦
+```shell
+[root@aliyun ~]# free -h
+              total        used        free      shared  buff/cache   available
+Mem:           3.5G        219M        569M        492K        2.7G        3.0G
+Swap:            0B          0B          0B
+```
 
-  ```shell
-  [root@mini1 home]# ll
-  total 16
-  drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 02xiaofeng
-  -rw-r--r--. 1 root       root          0 Jul 30 23:43 filehaha.txt
-  drwxr-xr-x. 4 root       root       4096 Jul 22 23:44 haha
-  drwx------. 5 guoxiaohui guoxiaohui 4096 Jul 28 13:35 xiaofeng
-  drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 xixi
-  [root@mini1 home]# du -sh *  ## 查看当前文件下所有文件夹以及文件的大小
-  4.0K    02xiaofeng
-  0       filehaha.txt
-  20K     haha
-  254M    xiaofeng
-  4.0K    xixi
-  ```
+#### **df**
+
+查看整体的哦
+
+* df -h：文件系统的磁盘使用情况统计
+* df -h /home/xiaofeng：挂载点以及对应的文件系统，实际意义不大
+
+#### **du**
+
+查看细节的哦
+
+* -s, --summarize       display only a total for each argument
+* -i, --inodes          list inode information instead of block usage
+* -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)
+
+```shell
+[root@mini1 home]# ll
+total 16
+drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 02xiaofeng
+-rw-r--r--. 1 root       root          0 Jul 30 23:43 filehaha.txt
+drwxr-xr-x. 4 root       root       4096 Jul 22 23:44 haha
+drwx------. 5 guoxiaohui guoxiaohui 4096 Jul 28 13:35 xiaofeng
+drwxr-xr-x. 2 root       root       4096 Jul 22 23:44 xixi
+[root@mini1 home]# du -sh *  ## 查看当前文件下所有文件夹以及文件的大小
+4.0K    02xiaofeng
+0       filehaha.txt
+20K     haha
+254M    xiaofeng
+4.0K    xixi
+## -i  inode总数，使用数，空闲数
+[root@aliyun tmp]# df -i
+Filesystem      Inodes  IUsed   IFree IUse% Mounted on
+devtmpfs        458506    327  458179    1% /dev
+tmpfs           461060      2  461058    1% /dev/shm
+tmpfs           461060    413  460647    1% /run
+tmpfs           461060     16  461044    1% /sys/fs/cgroup
+/dev/vda1      2621440 189903 2431537    8% /
+tmpfs           461060      1  461059    1% /run/user/
+```
+
+### lsblk
+
+list block device
+
+```shell
+[root@knowledge-center-test ~]# lsblk
+NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda               8:0    0  108G  0 disk 
+├─sda1            8:1    0    1G  0 part /boot
+└─sda2            8:2    0  107G  0 part 
+  ├─centos-root 253:0    0   99G  0 lvm  /
+  └─centos-swap 253:1    0    8G  0 lvm  
+sdb               8:16   0  500G  0 disk 
+└─vg--data-data 253:2    0  500G  0 lvm  /data
+sr0              11:0    1 1024M  0 rom
+```
+
+
 
 ###  uniq;sort
 
