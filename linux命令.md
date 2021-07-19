@@ -116,6 +116,11 @@ ls -lrt | grep *pop3*
 [root@aliyun xiaofeng]# ls -lsh wocao nginx-1.16.0.tar.gz 
 1012K -rw-r--r-- 1 root root 1009K Jul 30  2020 nginx-1.16.0.tar.gz
  4.0K -rw-r--r-- 4 root root    59 Jul 15 11:41 wocao
+ 
+ 
+ ls -l /etc/man_db.conf;  ## 默认 --time=mtime(modification)  内容的修改时间
+ ls -l --time=atime  /etc/man_db.conf;  ## a=access  访问时间
+ ls -l --time=ctime  /etc/man_db.conf;  ## c=status  权限，属性等的修改时间
 ```
 ###  mkdir;rm
 
@@ -206,7 +211,9 @@ grep -i 'fffff' 123.txt | wc -l ##管道
 
 ```shell
 ## 一次性将文件内容全部输出（控制台）
-cat  
+cat
+-b, --number-nonblank    number nonempty output lines, overrides -n
+-n, --number             number all output lines
 ## more命令可以选择性忽略了
 ## -m  显示百分比，我觉得这个很有用
 ## q 退出
@@ -527,6 +534,14 @@ zip --help
 * find --help
 
 -name 指查找文件名；-type 指要查找的文件类型；-perm  文件权限；-user 所属主
+
+```shell
+find /home/xiaofeng -mtime 4  ## 一天前之内所更新的文件，0就是今天，1就是昨天，以此类推
+find /home/xiaofeng -mtime -4  
+find /home/xiaofeng -mtime +4
+```
+
+![image-20210719113210795](C:\Users\guoxiaofeng03\AppData\Roaming\Typora\typora-user-images\image-20210719113210795.png)
 
 ```shell
 find -name sfapp   当前目录下查询是否有sfapp这个文件或者文件夹
